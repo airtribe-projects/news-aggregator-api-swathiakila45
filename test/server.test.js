@@ -5,9 +5,9 @@ const server = supertest(app);
 
 const mockUser = {
     name: 'Clark Kent',
-    email: 'clark@superman.com',
+    email: 'clark@superman13.com',
     password: 'Krypt()n8',
-    preferences:['movies', 'comics']
+    preferences:{"categories":["technology","business"],"languages":["en"],"countries":["us"],"sources":["techcrunch","bloomberg"]}
 };
 
 let token = '';
@@ -16,6 +16,7 @@ let token = '';
 
 tap.test('POST /users/signup', async (t) => { 
     const response = await server.post('/users/signup').send(mockUser);
+    // console.log(response)
     t.equal(response.status, 200);
     t.end();
 });
@@ -25,6 +26,7 @@ tap.test('POST /users/signup with missing email', async (t) => {
         name: mockUser.name,
         password: mockUser.password
     });
+    console.log(`Response Status in Sign up , ${response.status}`)
     t.equal(response.status, 400);
     t.end();
 });
@@ -49,12 +51,14 @@ tap.test('POST /users/login with wrong password', async (t) => {
     t.end();
 });
 
-// Preferences tests
+// // Preferences tests
 
 tap.test('GET /users/preferences', async (t) => {
-    const response = await server.get('/users/preferences').set('Authorization', `Bearer ${token}`);
+    console.log(token)
+    const response = await server.get('/users/preferences').set('Authorization', token);
     t.equal(response.status, 200);
     t.hasOwnProp(response.body, 'preferences');
+    // console.log(`PReferences check`,response.body.preferences)
     t.same(response.body.preferences, mockUser.preferences);
     t.end();
 });
@@ -66,24 +70,25 @@ tap.test('GET /users/preferences without token', async (t) => {
 });
 
 tap.test('PUT /users/preferences', async (t) => {
-    const response = await server.put('/users/preferences').set('Authorization', `Bearer ${token}`).send({
-        preferences: ['movies', 'comics', 'games']
+    const response = await server.put('/users/preferences').set('Authorization', token).send({
+        preferences: {"categories":["technology","business"],"languages":["en"],"countries":["us"],"sources":["techcrunch","bloomberg"]}
     });
     t.equal(response.status, 200);
 });
 
 tap.test('Check PUT /users/preferences', async (t) => {
-    const response = await server.get('/users/preferences').set('Authorization', `Bearer ${token}`);
+    const response = await server.get('/users/preferences').set('Authorization', token);
     t.equal(response.status, 200);
-    t.same(response.body.preferences, ['movies', 'comics', 'games']);
+    t.same(response.body.preferences, {"categories":["technology","business"],"languages":["en"],"countries":["us"],"sources":["techcrunch","bloomberg"]});
     t.end();
 });
 
-// News tests
+// // News tests
 
 tap.test('GET /news', async (t) => {
-    const response = await server.get('/news').set('Authorization', `Bearer ${token}`);
+    const response = await server.get('/news').set('Authorization', token);
     t.equal(response.status, 200);
+    console.log(`news in responsebody`,response.body)
     t.hasOwnProp(response.body, 'news');
     t.end();
 });
