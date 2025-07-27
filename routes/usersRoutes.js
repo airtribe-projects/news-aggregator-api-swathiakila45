@@ -11,10 +11,12 @@ const { registerUser, loginUser,getListofPreferences,modifyPreferences,getNewsAr
 //JWT MIDDLEWARE to AUTHORIZE users for secured apis
 const authorisationMiddleware = (req, res, next) => {
     const headers = req.headers || {};
+    console.log(headers)
     const token = headers.authorization;
 
+    //Token missing implemented in the middleware
     if (!token) {
-        return res.status(400).send({"message": "Token not found"});
+        return res.status(401).send({"message": "Token not found"});
     }
 
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
@@ -28,7 +30,7 @@ const authorisationMiddleware = (req, res, next) => {
 }
 
 //Step 2
-router.post('/register', registerUser) //Register a new User 
+router.post('/signup', registerUser) //Register a new User 
 router.post('/login', loginUser) // Login of existing user
 
 //Step 3
@@ -36,6 +38,6 @@ router.get('/preferences', [authorisationMiddleware], getListofPreferences) // G
 router.put('/preferences', [authorisationMiddleware], modifyPreferences) // Update teh preferences for a user
 
 //Step 4
-router.get('/news',getNewsArticles) // get news articles 
+ // get news articles 
 
 module.exports = router;
